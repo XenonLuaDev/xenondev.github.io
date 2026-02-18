@@ -1,70 +1,134 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>Xelua</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>ゲームテレポーター</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .neon {
+      text-shadow:
+        0 0 5px white,
+        0 0 10px white,
+        0 0 20px white;
+    }
+
+    #loadingContainer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60%;
+    }
+
+    #progressBar {
+      width: 100%;
+      height: 20px;
+      border: 1px solid white;
+      box-shadow: 0 0 10px white;
+      margin-top: 20px;
+    }
+
+    #progress {
+      height: 100%;
+      width: 0%;
+      background: white;
+      box-shadow: 0 0 10px white;
+      transition: width 0.05s linear;
+    }
+
+    #successText {
+      display: none;
+      margin-top: 20px;
+      font-size: 24px;
+    }
+
+    #pranked {
+      display: none;
+      position: absolute;
+      top: 40%;
+      width: 100%;
+      font-size: 60px;
+    }
+
+    #videoPopup {
+      display: none;
+      position: fixed;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 80%;
+      max-width: 900px;
+      border: 2px solid white;
+      box-shadow: 0 0 20px white;
+      transition: transform 0.4s ease;
+    }
+
+    #videoPopup.show {
+      display: block;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    video {
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
-  <header class="header">
-    <div class="logo">Xelua</div>
-    <a class="btn" href="#">Download</a>
-  </header>
 
-  <main class="hero">
-    <h1>
-      新時代の<br />
-      <span>日本製マップ</span>
-    </h1>
-    <p>
-      Xeluaは、最高クオリティのマップ体験を提供します。
-    </p>
-    <a class="btn big" href="#">Get Started</a>
-  </main>
+<div id="loadingContainer">
+  <div class="neon">Loading Game...</div>
+  <div id="progressBar">
+    <div id="progress"></div>
+  </div>
+  <div id="successText" class="neon">✔ LOAD SUCCESS</div>
+</div>
 
-  <section class="features">
-    <h2>
-      最高級の <span>クオリティ</span>
-    </h2>
-    <p class="features-sub">
-      最高クオリティのマップ体験。<br />
-      どんな日本製マップにも、決して負けない。
-    </p>
+<div id="pranked" class="neon">ゲームにテレポート中です...</div>
 
-    <div class="feature-grid">
-      <div class="card">
-        <h3>見やすいUI</h3>
-        <p>
-          細部まで徹底的に作り込まれたボタンとフレーム。
-          一目で違いが分かる、圧倒的な見やすさ。
-        </p>
-      </div>
+<div id="videoPopup">
+  <video id="rickVideo">
+    <source src="video.mp4" type="video/mp4">
+  </video>
+</div>
 
-      <div class="card">
-        <h3>最適化されたパフォーマンス</h3>
-        <p>
-          高品質でありながら軽量設計。
-          安定したパフォーマンスを常に維持。
-        </p>
-      </div>
+<script>
+  let progress = 0;
+  const progressBar = document.getElementById("progress");
+  const successText = document.getElementById("successText");
 
-      <div class="card">
-        <h3>管理者乱用の防止</h3>
-        <p>
-          ユーザーの体験を邪魔する乱用者を
-          絶対に作りだしません。
-        </p>
-      </div>
-    </div>
-  </section>
+  const interval = setInterval(() => {
+    progress += 1.5;
+    progressBar.style.width = progress + "%";
 
-  <div class="glow left"></div>
-  <div class="glow right"></div>
-<div class="snow snow-1"></div>
-<div class="snow snow-2"></div>
-<div class="snow snow-3"></div>
+    if (progress >= 100) {
+      clearInterval(interval);
+      successText.style.display = "block";
 
+      // 1秒後にローディング消す
+      setTimeout(() => {
+        document.getElementById("loadingContainer").style.display = "none";
+        document.getElementById("pranked").style.display = "block";
+
+        // 3秒後に動画表示＆再生
+        setTimeout(() => {
+          const popup = document.getElementById("videoPopup");
+          popup.classList.add("show");
+          document.getElementById("rickVideo").play();
+        }, 3000);
+
+      }, 1000);
+    }
+  }, 40);
+</script>
 
 </body>
 </html>
