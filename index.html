@@ -1,86 +1,85 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>ゲームテレポーター</title>
+<meta charset="UTF-8">
+<title>System Launch</title>
 
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      color: white;
-      font-family: 'Courier New', monospace;
-      text-align: center;
-      overflow: hidden;
-    }
+<style>
+body {
+  margin: 0;
+  background: black;
+  color: white;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  overflow: hidden;
+}
 
-    .neon {
-      text-shadow:
-        0 0 5px white,
-        0 0 10px white,
-        0 0 20px white;
-    }
+.neon {
+  text-shadow:
+    0 0 5px white,
+    0 0 10px white,
+    0 0 20px white;
+}
 
-    #loadingContainer {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 60%;
-    }
+#loadingContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+}
 
-    #progressBar {
-      width: 100%;
-      height: 20px;
-      border: 1px solid white;
-      box-shadow: 0 0 10px white;
-      margin-top: 20px;
-    }
+#progressBar {
+  width: 100%;
+  height: 20px;
+  border: 1px solid white;
+  box-shadow: 0 0 10px white;
+  margin-top: 20px;
+}
 
-    #progress {
-      height: 100%;
-      width: 0%;
-      background: white;
-      box-shadow: 0 0 10px white;
-      transition: width 0.05s linear;
-    }
+#progress {
+  height: 100%;
+  width: 0%;
+  background: white;
+  box-shadow: 0 0 10px white;
+  transition: width 0.05s linear;
+}
 
-    #successText {
-      display: none;
-      margin-top: 20px;
-      font-size: 24px;
-    }
+#successText {
+  display: none;
+  margin-top: 20px;
+  font-size: 24px;
+}
 
-    #pranked {
-      display: none;
-      position: absolute;
-      top: 40%;
-      width: 100%;
-      font-size: 60px;
-    }
+#pranked {
+  display: none;
+  position: absolute;
+  top: 40%;
+  width: 100%;
+  font-size: 60px;
+}
 
-    #videoPopup {
-      display: none;
-      position: fixed;
-      top: 60%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      width: 80%;
-      max-width: 900px;
-      border: 2px solid white;
-      box-shadow: 0 0 20px white;
-      transition: transform 0.4s ease;
-    }
+#videoPopup {
+  position: fixed;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 900px;
+  border: 2px solid white;
+  box-shadow: 0 0 20px white;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
 
-    #videoPopup.show {
-      display: block;
-      transform: translate(-50%, -50%) scale(1);
-    }
+#videoPopup.show {
+  opacity: 1;
+}
 
-    video {
-      width: 100%;
-    }
-  </style>
+video {
+  width: 100%;
+}
+</style>
 </head>
 <body>
 
@@ -92,42 +91,56 @@
   <div id="successText" class="neon">✔ LOAD SUCCESS</div>
 </div>
 
-<div id="pranked" class="neon">ゲームにテレポート中です...</div>
+<div id="pranked" class="neon">騙されたね！😈</div>
 
 <div id="videoPopup">
-  <video id="rickVideo">
+  <video id="rickVideo"
+         preload="auto"
+         muted
+         playsinline>
     <source src="video.mp4" type="video/mp4">
   </video>
 </div>
 
 <script>
-  let progress = 0;
-  const progressBar = document.getElementById("progress");
-  const successText = document.getElementById("successText");
+let progress = 0;
+const progressBar = document.getElementById("progress");
+const successText = document.getElementById("successText");
+const video = document.getElementById("rickVideo");
+const popup = document.getElementById("videoPopup");
 
-  const interval = setInterval(() => {
-    progress += 1.5;
-    progressBar.style.width = progress + "%";
+// 動画が再生可能になったら再生
+video.addEventListener("canplay", () => {
+  video.play().catch(() => {});
+});
 
-    if (progress >= 100) {
-      clearInterval(interval);
-      successText.style.display = "block";
+// ローディングバー進行
+const interval = setInterval(() => {
+  progress += 1.5;
+  progressBar.style.width = progress + "%";
 
-      // 1秒後にローディング消す
+  if (progress >= 100) {
+    clearInterval(interval);
+    successText.style.display = "block";
+
+    setTimeout(() => {
+      document.getElementById("loadingContainer").style.display = "none";
+      document.getElementById("pranked").style.display = "block";
+
+      // 3秒見せてから動画表示
       setTimeout(() => {
-        document.getElementById("loadingContainer").style.display = "none";
-        document.getElementById("pranked").style.display = "block";
+        popup.classList.add("show");
 
-        // 3秒後に動画表示＆再生
+        // 1秒後に音ON（自動再生安定用）
         setTimeout(() => {
-          const popup = document.getElementById("videoPopup");
-          popup.classList.add("show");
-          document.getElementById("rickVideo").play();
-        }, 3000);
+          video.muted = false;
+        }, 1000);
 
-      }, 1000);
-    }
-  }, 40);
+      }, 3000);
+
+    }, 1000);
+  }
+}, 40);
 </script>
 
 </body>
